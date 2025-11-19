@@ -110,7 +110,16 @@ class _FichasPlantasState extends State<FichasPlantas> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Fichas de Plantas'), backgroundColor: const Color(0xFFD0EAFF)),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Image.asset('assets/ficha.png', width: 40, height: 40),
+            SizedBox(width: 20),
+            Text('Fichas de Plantas', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
       backgroundColor: const Color(0xFFD0EAFF),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
