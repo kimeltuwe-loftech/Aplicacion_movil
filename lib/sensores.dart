@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -42,10 +44,37 @@ class _SensoresState extends State<Sensores> {
   Set<String> _sensoresRecibidos = {};
   UDP? _receiver;
 
+  // Toggle this to true to use generated example data instead of UDP.
+  final bool _useMock = true;
+  Timer? _mockTimer;
+  final Random _rand = Random();
+
   @override
   void initState() {
     super.initState();
-    _escucharUDP();
+    if (_useMock) {
+      _startMockData();
+    } else {
+      _escucharUDP();
+    }
+  }
+
+  void _startMockData() {
+    // Generate mock readings every second for all sensors defined in _colores.
+    _mockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      final now = DateTime.now();
+      final types = _colores.keys.toList();
+
+      final List<Map<String, dynamic>> sensorData = types.map((type) {
+        final limits = _limites[type]!;
+        final min = limits[0];
+        final max = limits[1];
+        final value = min + _rand.nextDouble() * (max - min);
+        return {'type': type, 'value': double.parse(value.toStringAsFixed(2))};
+      }).toList();
+
+      _processSensorData(sensorData, now);
+    });
   }
 
   void _escucharUDP() async {
@@ -55,7 +84,13 @@ class _SensoresState extends State<Sensores> {
 
       final dataString = utf8.decode(datagram.data);
       final sensorData = json.decode(dataString) as List<dynamic>;
+      _processSensorData(sensorData, DateTime.now());
+    });
+  }
 
+  void _processSensorData(List<dynamic> sensorData, DateTime timestamp) {
+    // Single setState per batch for efficiency.
+    setState(() {
       for (var measurement in sensorData) {
         var type = measurement["type"];
         var rawValue = measurement["value"];
@@ -64,22 +99,18 @@ class _SensoresState extends State<Sensores> {
         if (rawValue is num) {
           value = rawValue.toDouble();
         } else if (rawValue is String) {
-          value = double.tryParse(
-            rawValue,
-          ); // Handle string representations like "25.5"
+          value = double.tryParse(rawValue);
         }
 
         if (value != null) {
-          setState(() {
-            _sensoresRecibidos.add(type);
-            _valoresPorSensor.putIfAbsent(type, () => []);
-            _valoresPorSensor[type]!.add(
-              FlSpot(DateTime.now().second.toDouble(), value!),
-            );
-            if (_valoresPorSensor[type]!.length > 20) {
-              _valoresPorSensor[type]!.removeAt(0);
-            }
-          });
+          _sensoresRecibidos.add(type);
+          _valoresPorSensor.putIfAbsent(type, () => []);
+          _valoresPorSensor[type]!.add(
+            FlSpot(timestamp.second.toDouble(), value),
+          );
+          if (_valoresPorSensor[type]!.length > 20) {
+            _valoresPorSensor[type]!.removeAt(0);
+          }
         }
       }
     });
@@ -88,6 +119,7 @@ class _SensoresState extends State<Sensores> {
   @override
   void dispose() {
     _receiver?.close();
+    _mockTimer?.cancel();
     super.dispose();
   }
 
