@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
 import 'sensores.dart';
 import 'ficha.dart';
+import 'l10n/app_localizations.dart';
+// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() => runApp(const MyApp());
+void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale _locale = Locale('en');
+
+  void setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
 
   // This widget is the root of your application.
   @override
@@ -13,6 +27,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Material App',
+      locale: _locale,
+      supportedLocales: const [Locale('es'), Locale('en')],
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: Scaffold(
         backgroundColor: const Color(0xFFD0EAFF),
         body: ListView(
@@ -42,9 +64,8 @@ class MyApp extends StatelessWidget {
             // New buttons
             Center(
               child: Builder(
-                builder: (context) => Container(
+                builder: (context) => SizedBox(
                   width: 300,
-                  // color: Colors.red,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -81,7 +102,7 @@ class MyApp extends StatelessWidget {
                               height: 50,
                             ),
                             SizedBox(width: 20),
-                            const Text('Sensores'),
+                            Text(AppLocalizations.of(context)!.sensors),
                           ],
                         ),
                       ),
@@ -122,12 +143,17 @@ class MyApp extends StatelessWidget {
                           ],
                         ),
                       ),
+                      Switch(
+                        value: _locale == const Locale('en'),
+                        onChanged: (bool value) {
+                          setLocale(value ? const Locale('en') : const Locale('es'));
+                        },
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-
           ],
         ),
       ),
