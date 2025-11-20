@@ -21,18 +21,17 @@ class _SensorGraphState extends State<SensorGraph> {
   UDP? _receiver;
   // Toggle to true to use generated example data instead of UDP.
   final bool _useMock = true;
+  bool _initialized = false;
   Timer? _mockTimer;
   final Random _rand = Random();
 
   @override
-  void initState() {
-    super.initState();
-    _startMockData();
-    // if (_useMock) {
-    // }
-    // } else {
-    //   _escucharUDP();
-    // }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _startMockData();
+      _initialized = true;
+    }
   }
 
   void _startMockData() {
