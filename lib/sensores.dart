@@ -7,6 +7,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:udp/udp.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'l10n/app_localizations.dart';
+import 'globals/mapuche_facts.dart';
+// import 'loading_icon.dart';
 
 import 'sensor_graph.dart';
 import 'globals/sensor_definitions.dart';
@@ -21,7 +23,7 @@ class Sensores extends StatefulWidget {
 
 class _SensoresState extends State<Sensores> {
   Map<String, List<FlSpot>> _valoresPorSensor = {};
-  final loading = false;
+  final loading = true;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,10 @@ class _SensoresState extends State<Sensores> {
           children: [
             Image.asset('assets/sensores_principal.png', width: 40, height: 40),
             SizedBox(width: 20),
-            Text(AppLocalizations.of(context)!.sensors, style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              AppLocalizations.of(context)!.sensors,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
@@ -42,17 +47,19 @@ class _SensoresState extends State<Sensores> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // SpinningSvgLoader(),
                   SpinKitCubeGrid(color: const Color(0xFF009900), size: 50.0),
                   SizedBox(height: 10),
                   Text(
                     'Sabias que ...',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                       color: Colors.grey[800],
                     ),
                   ),
-                  Text('Mapuche (...)'),
+                  Text(getRandomMapucheFact(), textAlign: TextAlign.center),
                   SizedBox(height: 30),
                   Builder(
                     builder: (context) => ElevatedButton(
