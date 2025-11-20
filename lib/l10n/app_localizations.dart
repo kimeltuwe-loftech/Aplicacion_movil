@@ -103,6 +103,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Sensores'**
   String get sensors;
+
+  /// No description provided for @plantsInformation.
+  ///
+  /// In es, this message translates to:
+  /// **'Fichas de Plantas'**
+  String get plantsInformation;
+
+  /// No description provided for @sensorAmbientTemperature.
+  ///
+  /// In es, this message translates to:
+  /// **'Temperatura ambiente'**
+  String get sensorAmbientTemperature;
+
+  /// No description provided for @sensorAmbientHumidity.
+  ///
+  /// In es, this message translates to:
+  /// **'Humedad ambiente'**
+  String get sensorAmbientHumidity;
+
+  /// No description provided for @sensorParticulateMatter.
+  ///
+  /// In es, this message translates to:
+  /// **'Material particulado'**
+  String get sensorParticulateMatter;
+
+  /// No description provided for @sensorLuminosity.
+  ///
+  /// In es, this message translates to:
+  /// **'Luminosidad'**
+  String get sensorLuminosity;
+
+  /// No description provided for @sensorSoilHumidity.
+  ///
+  /// In es, this message translates to:
+  /// **'Humedad suelo'**
+  String get sensorSoilHumidity;
+
+  /// No description provided for @sensorRain.
+  ///
+  /// In es, this message translates to:
+  /// **'Lluvia'**
+  String get sensorRain;
 }
 
 class _AppLocalizationsDelegate

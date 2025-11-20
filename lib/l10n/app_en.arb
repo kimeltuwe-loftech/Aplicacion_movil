@@ -1,5 +1,12 @@
 {
   "@@locale": "en",
-  "sensors": "Küpalfe"
+  "sensors": "Küpalfe",
+  "plantsInformation": "Xayen ñi kimün",
+  "sensorAmbientTemperature": "Temperatura ñi mapu",
+  "sensorAmbientHumidity": "Mañumtun ñi mapu",
+  "sensorParticulateMatter": "Küzaw püle rüpü",
+  "sensorLuminosity": "Lihuen",
+  "sensorSoilHumidity": "Mañumtun ñi mapu lladkü",
+  "sensorRain": "Mawün"
 
 }

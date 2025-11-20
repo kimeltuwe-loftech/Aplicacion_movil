@@ -139,15 +139,25 @@ class _MyAppState extends State<MyApp> {
                               height: 50,
                             ),
                             SizedBox(width: 20),
-                            const Text('Fichas de Plantas'),
+                            Text(AppLocalizations.of(context)!.plantsInformation),
                           ],
                         ),
                       ),
-                      Switch(
-                        value: _locale == const Locale('en'),
-                        onChanged: (bool value) {
-                          setLocale(value ? const Locale('en') : const Locale('es'));
-                        },
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Español'),
+                          Switch(
+                            value: _locale == const Locale('en'),
+                            onChanged: (bool value) {
+                              setLocale(
+                                value ? const Locale('en') : const Locale('es'),
+                              );
+                            },
+                          ),
+                          Text("Mapudungung"),
+                        ],
                       ),
                     ],
                   ),

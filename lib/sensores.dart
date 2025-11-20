@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:udp/udp.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'l10n/app_localizations.dart';
 
 import 'sensor_graph.dart';
 import 'globals/sensor_definitions.dart';
@@ -31,7 +32,7 @@ class _SensoresState extends State<Sensores> {
           children: [
             Image.asset('assets/sensores_principal.png', width: 40, height: 40),
             SizedBox(width: 20),
-            Text('Sensores', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(AppLocalizations.of(context)!.sensors, style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -86,6 +87,7 @@ class _SensoresState extends State<Sensores> {
                     crossAxisSpacing: 20,
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     children: SensorType.values.map((sensorType) {
+                      final sensorInfo = getSensorInfo(context);
                       final info = sensorInfo[sensorType];
                       if (info == null) return SizedBox();
                       return Builder(

@@ -36,6 +36,7 @@ class _SensorGraphState extends State<SensorGraph> {
   }
 
   void _startMockData() {
+    final sensorInfo = getSensorInfo(context);
     final info = sensorInfo[widget.sensorType]!;
     final limits = info.limites;
     _mockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -93,6 +94,7 @@ class _SensorGraphState extends State<SensorGraph> {
 
   @override
   Widget build(BuildContext context) {
+    final sensorInfo = getSensorInfo(context);
     final info = sensorInfo[widget.sensorType]!;
     final limits = info.limites;
     final unidad = info.unidad;

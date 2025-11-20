@@ -10,4 +10,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sensors => 'Küpalfe';
+
+  @override
+  String get plantsInformation => 'Xayen ñi kimün';
+
+  @override
+  String get sensorAmbientTemperature => 'Temperatura ñi mapu';
+
+  @override
+  String get sensorAmbientHumidity => 'Mañumtun ñi mapu';
+
+  @override
+  String get sensorParticulateMatter => 'Küzaw püle rüpü';
+
+  @override
+  String get sensorLuminosity => 'Lihuen';
+
+  @override
+  String get sensorSoilHumidity => 'Mañumtun ñi mapu lladkü';
+
+  @override
+  String get sensorRain => 'Mawün';
 }

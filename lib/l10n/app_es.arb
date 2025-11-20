@@ -1,4 +1,11 @@
 {
   "@@locale": "es",
-  "sensors": "Sensores"
+  "sensors": "Sensores",
+  "plantsInformation": "Fichas de Plantas",
+  "sensorAmbientTemperature": "Temperatura ambiente",
+  "sensorAmbientHumidity": "Humedad ambiente",
+  "sensorParticulateMatter": "Material particulado",
+  "sensorLuminosity": "Luminosidad",
+  "sensorSoilHumidity": "Humedad suelo",
+  "sensorRain": "Lluvia"
 }
