@@ -20,7 +20,7 @@ class SensorInfo {
   const SensorInfo({
     required this.label,
     required this.color,
-    this.icon,
+    required this.icon,
     required this.limites,
     required this.unidad,
   });
@@ -79,4 +79,17 @@ Map<SensorType, SensorInfo> getSensorInfo(BuildContext context) {
       unidad: '%Lluvia',
     ),
   };
+}
+
+const Map<SensorType, String> sensorUdpLabels = {
+  SensorType.temperaturaAmbiente: "Temperatura ambiente",
+  SensorType.humedadAmbiente: "Humedad ambiente",
+  SensorType.materialParticulado: "Material particulado",
+  SensorType.luminosidad: "Luminosidad",
+  SensorType.humedadSuelo: "Humedad suelo",
+  SensorType.lluvia: "Lluvia",
+};
+
+SensorType? sensorTypeFromUdpLabel(String udpLabel) {
+  return sensorUdpLabels.entries.firstWhere((e) => e.value == udpLabel).key;
 }

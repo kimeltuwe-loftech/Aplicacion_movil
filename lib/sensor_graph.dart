@@ -1,104 +1,42 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:udp/udp.dart';
+import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+
+import 'util/udp.dart';
 
 import 'globals/sensor_definitions.dart';
 
 class SensorGraph extends StatefulWidget {
   final SensorType sensorType;
-  SensorGraph({super.key, required this.sensorType});
+  SensorGraph({
+    super.key,
+    required this.sensorType,
+  });
 
   @override
   State<SensorGraph> createState() => _SensorGraphState();
 }
 
 class _SensorGraphState extends State<SensorGraph> {
-  final List<FlSpot> _valores = [];
-  UDP? _receiver;
-  // Toggle to true to use generated example data instead of UDP.
-  final bool _useMock = true;
   bool _initialized = false;
-  Timer? _mockTimer;
-  final Random _rand = Random();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      _startMockData();
       _initialized = true;
     }
   }
 
-  void _startMockData() {
-    final sensorInfo = getSensorInfo(context);
-    final info = sensorInfo[widget.sensorType]!;
-    final limits = info.limites;
-    _mockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final now = DateTime.now();
-      final min = limits[0];
-      final max = limits[1];
-      final value = min + _rand.nextDouble() * (max - min);
-
-      setState(() {
-        _valores.add(
-          FlSpot(now.second.toDouble(), double.parse(value.toStringAsFixed(2))),
-        );
-        if (_valores.length > 20) _valores.removeAt(0);
-      });
-    });
-  }
-
-  // void _escucharUDP() async {
-  //   _receiver = await UDP.bind(Endpoint.any(port: Port(12345)));
-  //   _receiver!.asStream().listen((datagram) {
-  //     if (datagram == null) return;
-  //     final dataString = utf8.decode(datagram.data);
-  //     final sensorData = json.decode(dataString) as List<dynamic>;
-  //     _processSensorData(sensorData, DateTime.now());
-  //   });
-  // }
-
-  // void _processSensorData(List<dynamic> sensorData, DateTime timestamp) {
-  //   final tipo = widget.sensorName;
-  //   for (var measurement in sensorData) {
-  //     if (measurement is Map && measurement['type'] == tipo) {
-  //       var rawValue = measurement['value'];
-  //       double? value;
-  //       if (rawValue is num)
-  //         value = rawValue.toDouble();
-  //       else if (rawValue is String)
-  //         value = double.tryParse(rawValue);
-  //       if (value != null) {
-  //         setState(() {
-  //           _valores.add(FlSpot(timestamp.second.toDouble(), value));
-  //           if (_valores.length > 20) _valores.removeAt(0);
-  //         });
-  //       }
-  //       break; // only one sensor tracked
-  //     }
-  //   }
-  // }
-
-  @override
-  void dispose() {
-    _receiver?.close();
-    _mockTimer?.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final PrototypeConnection conn = context.watch<PrototypeConnection>();
+    final spots = conn.getSensorValues(widget.sensorType);
+
     final sensorInfo = getSensorInfo(context);
     final info = sensorInfo[widget.sensorType]!;
-    final limits = info.limites;
-    final unidad = info.unidad;
-    final color = info.color;
-    final spots = _valores.isNotEmpty ? _valores : [FlSpot(0, limits[0])];
 
     return Scaffold(
       appBar: AppBar(
@@ -123,14 +61,14 @@ class _SensorGraphState extends State<SensorGraph> {
               LineChartData(
                 minX: 0,
                 maxX: 59,
-                minY: limits[0],
-                maxY: limits[1],
+                minY: info.limites[0],
+                maxY: info.limites[1],
                 lineBarsData: [
                   LineChartBarData(
                     spots: spots,
                     isCurved: true,
                     preventCurveOverShooting: true,
-                    color: color,
+                    color: info.color,
                     barWidth: 2,
                     dotData: FlDotData(show: true),
                   ),
@@ -138,7 +76,7 @@ class _SensorGraphState extends State<SensorGraph> {
                 titlesData: FlTitlesData(
                   leftTitles: AxisTitles(
                     axisNameWidget: Text(
-                      unidad,
+                      info.unidad,
                       style: const TextStyle(
                         color: Color(0xFF009900),
                         fontWeight: FontWeight.bold,
@@ -209,7 +147,7 @@ class _SensorGraphState extends State<SensorGraph> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(width: 16, height: 16, color: color),
+              Container(width: 16, height: 16, color: info.color),
               const SizedBox(width: 8),
               // Text(tipo[0].toUpperCase() + tipo.substring(1)),
             ],

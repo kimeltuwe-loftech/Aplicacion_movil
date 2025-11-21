@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'sensores.dart';
 import 'ficha.dart';
 import 'l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'util/udp.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(
+    ChangeNotifierProvider<PrototypeConnection>(
+      create: (_) {
+        final conn = PrototypeConnection();
+        conn.startListeningUDP(); // start listening once, shared by whole app
+        return conn;
+      },
+      child: MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -139,7 +152,9 @@ class _MyAppState extends State<MyApp> {
                               height: 50,
                             ),
                             SizedBox(width: 20),
-                            Text(AppLocalizations.of(context)!.plantsInformation),
+                            Text(
+                              AppLocalizations.of(context)!.plantsInformation,
+                            ),
                           ],
                         ),
                       ),

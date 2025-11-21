@@ -1,18 +1,12 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:udp/udp.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'l10n/app_localizations.dart';
 import 'globals/mapuche_facts.dart';
-// import 'loading_icon.dart';
-
 import 'sensor_graph.dart';
 import 'globals/sensor_definitions.dart';
 import 'connecting_help.dart';
+import 'package:provider/provider.dart';
+import 'util/udp.dart';
 
 class Sensores extends StatefulWidget {
   const Sensores({super.key});
@@ -22,11 +16,10 @@ class Sensores extends StatefulWidget {
 }
 
 class _SensoresState extends State<Sensores> {
-  Map<String, List<FlSpot>> _valoresPorSensor = {};
-  final loading = false;
-
   @override
   Widget build(BuildContext context) {
+    final prototypeConnection = context.watch<PrototypeConnection>();
+    final loading = prototypeConnection.isStale;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -90,7 +83,12 @@ class _SensoresState extends State<Sensores> {
               childAspectRatio: 0.7,
               physics: ScrollPhysics(),
               crossAxisSpacing: 10,
-              padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 100),
+              padding: const EdgeInsets.only(
+                left: 10,
+                right: 10,
+                top: 20,
+                bottom: 100,
+              ),
               children: SensorType.values.map((sensorType) {
                 final sensorInfo = getSensorInfo(context);
                 final info = sensorInfo[sensorType];
