@@ -18,7 +18,22 @@ class ConnectingHelp extends StatelessWidget {
         ),
       ),
       backgroundColor: Colors.white,
-      body: Text('test'),
+      body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 30),
+        children: [
+          SizedBox(height: 20),
+          Text('Option 1: Connecting via QR code (easiest)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('1. Open the camera app'),
+          Text('2. Attach the battery to the prototype'),
+          Text('3. Scan the QR code with the phone, to connect to WiFi network'),
+          Text('4. Go back to the app, and you are done!'),
+          SizedBox(height: 20),
+          Text('Option 2: Connecting manually', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('1. Connect the battery to the prototype'),
+          Text('2. On the prototype display, look at the WiFi network name and password'),
+          Text('3. On the phone, open WiFi settings and connect to the network'),
+        ]
+      )
     );
   }
 }
