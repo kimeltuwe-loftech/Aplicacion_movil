@@ -32,26 +32,10 @@ class _FichasPlantasState extends State<FichasPlantas> {
     }
   }
 
-  Future<void> _guardarFichas() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('fichas_plantas', json.encode(_fichas));
-  }
-
   void _eliminarFicha(int index) {
     setState(() {
       _fichas.removeAt(index);
     });
-    _guardarFichas();
-  }
-
-  void _editarFicha(int index) {
-    // setState(() {
-    //   _editIndex = index;
-    //   _nombreController.text = _fichas[index]['nombre'];
-    //   _descripcionController.text = _fichas[index]['descripcion'];
-    //   _usosController.text = _fichas[index]['usos'];
-    //   _imagePath = _fichas[index]['imagen'];
-    // });
   }
 
   void _verFichaDetalle(Map<String, dynamic> ficha) {
@@ -126,10 +110,6 @@ class _FichasPlantasState extends State<FichasPlantas> {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => _editarFicha(i),
-                        ),
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () => _eliminarFicha(i),

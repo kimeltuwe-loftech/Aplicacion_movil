@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AgregarFicha extends StatefulWidget {
   const AgregarFicha({super.key});
@@ -14,25 +16,30 @@ class _AgregarFichaState extends State<AgregarFicha> {
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _descripcionController = TextEditingController();
   final TextEditingController _usosController = TextEditingController();
-  List<Map<String, dynamic>> _fichas = [];
+
   String? _imagePath;
 
-  void _agregarFicha() {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _fichas.add({
-          'nombre': _nombreController.text,
-          'descripcion': _descripcionController.text,
-          'usos': _usosController.text,
-          // 'imagen': _imagePath,
-        });
-        _nombreController.clear();
-        _descripcionController.clear();
-        _usosController.clear();
-        // _imagePath = null;
-      });
-      // _guardarFichas();
+  Future<void> _agregarFicha() async {
+    List<Map<String, dynamic>> fichas = [];
+    // Get current plants
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString('fichas_plantas');
+    if (data != null) {
+      fichas = (json.decode(data) as List)
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
     }
+
+    // Add ficha
+    fichas.add({
+      'nombre': _nombreController.text,
+      'descripcion': _descripcionController.text,
+      'usos': _usosController.text,
+      // 'imagen': _imagePath,
+    });
+
+    // Store ficha
+    await prefs.setString('fichas_plantas', json.encode(fichas));
   }
 
   Future<void> _tomarFoto() async {
@@ -108,36 +115,40 @@ class _AgregarFichaState extends State<AgregarFicha> {
                       v == null || v.isEmpty ? 'Ingrese los usos' : null,
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: _tomarFoto,
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        backgroundColor: const Color(0xFF009900),
-                        foregroundColor: Colors.white,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.add_a_photo),
-                          SizedBox(width: 5),
-                          Text('Tomar foto'),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    _imagePath != null
-                        ? Image.file(File(_imagePath!), width: 50, height: 50)
-                        : const SizedBox(),
-                  ],
-                ),
-                const SizedBox(height: 10),
+                // Row(
+                //   children: [
+                //     ElevatedButton(
+                //       onPressed: _tomarFoto,
+                //       style: ElevatedButton.styleFrom(
+                //         shape: RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.circular(10),
+                //         ),
+                //         backgroundColor: const Color(0xFF009900),
+                //         foregroundColor: Colors.white,
+                //       ),
+                //       child: Row(
+                //         children: [
+                //           Icon(Icons.add_a_photo),
+                //           SizedBox(width: 5),
+                //           Text('Tomar foto'),
+                //         ],
+                //       ),
+                //     ),
+                //     const SizedBox(width: 10),
+                //     _imagePath != null
+                //         ? Image.file(File(_imagePath!), width: 50, height: 50)
+                //         : const SizedBox(),
+                //   ],
+                // ),
+                // const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _agregarFicha,
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _agregarFicha();
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
