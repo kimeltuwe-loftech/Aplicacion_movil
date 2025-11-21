@@ -2,7 +2,6 @@ import 'package:udp/udp.dart';
 import 'dart:async';
 import 'dart:convert';
 import '../globals/sensor_definitions.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 
 class SensorSample {
