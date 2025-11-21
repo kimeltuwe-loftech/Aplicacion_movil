@@ -5,9 +5,20 @@ import '../globals/sensor_definitions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 
+class SensorSample {
+  final DateTime timestamp;
+  final double value;
+
+  SensorSample({
+    required this.timestamp,
+    required this.value,
+  });
+}
+
 class PrototypeConnection extends ChangeNotifier {
   UDP? _receiver;
-  final Map<SensorType, List<FlSpot>> _valuesPerSensor = {};
+  // now we store timestamp + value
+  final Map<SensorType, List<SensorSample>> _valuesPerSensor = {};
 
   // GLOBAL last measurement (for overall loading screen)
   DateTime? _lastMeasurementTime;
@@ -42,8 +53,9 @@ class PrototypeConnection extends ChangeNotifier {
     });
   }
 
-  List<FlSpot> getSensorValues(SensorType sensorType) {
-    return _valuesPerSensor[sensorType] ?? [FlSpot(0, 0)];
+  // Now returns SensorSample instead of FlSpot
+  List<SensorSample> getSensorValues(SensorType sensorType) {
+    return _valuesPerSensor[sensorType] ?? [];
   }
 
   void startListeningUDP() async {
@@ -78,7 +90,7 @@ class PrototypeConnection extends ChangeNotifier {
 
           _valuesPerSensor.putIfAbsent(sensorTypeEnum, () => []);
           _valuesPerSensor[sensorTypeEnum]!.add(
-            FlSpot(now.second.toDouble(), value),
+            SensorSample(timestamp: now, value: value),
           );
           if (_valuesPerSensor[sensorTypeEnum]!.length > 20) {
             _valuesPerSensor[sensorTypeEnum]!.removeAt(0);
