@@ -85,8 +85,8 @@ class _SensorGraphState extends State<SensorGraph> {
         backgroundColor: Colors.white,
         title: Row(
           children: [
-            Icon(info.icon, color: info.color, size: 40),
-            const SizedBox(width: 20),
+            Icon(info.icon, color: info.color, size: 35),
+            const SizedBox(width: 5),
             Text(
               info.label,
               style: const TextStyle(fontWeight: FontWeight.bold),
