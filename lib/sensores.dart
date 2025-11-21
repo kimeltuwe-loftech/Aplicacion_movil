@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'l10n/app_localizations.dart';
 import 'globals/mapuche_facts.dart';
 import 'sensor_graph.dart';
