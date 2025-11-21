@@ -123,18 +123,30 @@ class _SensoresState extends State<Sensores> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        const Row(
+                        const SizedBox(height: 8),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.circle, color: Colors.green),
+                            Icon(
+                              prototypeConnection.isSensorConnected(sensorType)
+                                  ? Icons.circle
+                                  : Icons.circle_outlined,
+                              color:
+                                  prototypeConnection.isSensorConnected(
+                                    sensorType,
+                                  )
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
                             SizedBox(width: 8),
                             Text(
-                              'Conectado',
+                              prototypeConnection.isSensorConnected(sensorType)
+                                  ? 'Conectado'
+                                  : 'Desconectado',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 15,
+                                fontSize: 13,
                               ),
                             ),
                           ],
