@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'sensores.dart';
-import 'ficha.dart';
+import 'ficha2.dart';
 import 'l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'util/udp.dart';
@@ -47,6 +47,12 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF009900), // <--- Your theme color
+          brightness: Brightness.light,
+        ),
+      ),
       home: Scaffold(
         backgroundColor: const Color(0xFFD0EAFF),
         body: ListView(
