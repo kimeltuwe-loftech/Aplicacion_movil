@@ -23,7 +23,7 @@ class Sensores extends StatefulWidget {
 
 class _SensoresState extends State<Sensores> {
   Map<String, List<FlSpot>> _valoresPorSensor = {};
-  final loading = true;
+  final loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -83,75 +83,69 @@ class _SensoresState extends State<Sensores> {
                 ],
               ),
             )
-          : ListView(
-              children: [
-                const SizedBox(height: 30),
-                Center(
-                  child: GridView.count(
-                    shrinkWrap: true,
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    children: SensorType.values.map((sensorType) {
-                      final sensorInfo = getSensorInfo(context);
-                      final info = sensorInfo[sensorType];
-                      if (info == null) return SizedBox();
-                      return Builder(
-                        builder: (BuildContext context) => ElevatedButton(
-                          onPressed: () => {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    SensorGraph(sensorType: sensorType),
-                              ),
-                            ),
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(info.icon, size: 100, color: info.color),
-                              const SizedBox(height: 8),
-                              Text(
-                                info.label,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.circle, color: Colors.green),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Conectado',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+          : GridView.count(
+              // shrinkWrap: true,
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              childAspectRatio: 0.7,
+              physics: ScrollPhysics(),
+              crossAxisSpacing: 10,
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 100),
+              children: SensorType.values.map((sensorType) {
+                final sensorInfo = getSensorInfo(context);
+                final info = sensorInfo[sensorType];
+                if (info == null) return SizedBox();
+                return Builder(
+                  builder: (BuildContext context) => ElevatedButton(
+                    onPressed: () => {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              SensorGraph(sensorType: sensorType),
+                        ),
+                      ),
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(info.icon, size: 100, color: info.color),
+                        const SizedBox(height: 8),
+                        Text(
+                          info.label,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      );
-                    }).toList(),
+                        const SizedBox(height: 4),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.circle, color: Colors.green),
+                            SizedBox(width: 8),
+                            Text(
+                              'Conectado',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 100),
-              ],
+                );
+              }).toList(),
             ),
     );
   }
