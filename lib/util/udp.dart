@@ -92,7 +92,7 @@ class PrototypeConnection extends ChangeNotifier {
           _valuesPerSensor[sensorTypeEnum]!.add(
             SensorSample(timestamp: now, value: value),
           );
-          if (_valuesPerSensor[sensorTypeEnum]!.length > 20) {
+          if (_valuesPerSensor[sensorTypeEnum]!.length > 10) {
             _valuesPerSensor[sensorTypeEnum]!.removeAt(0);
           }
         }
