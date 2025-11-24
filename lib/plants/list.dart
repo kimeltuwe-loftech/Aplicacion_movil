@@ -13,11 +13,19 @@ class FichasPlantas extends StatefulWidget {
 
 class _FichasPlantasState extends State<FichasPlantas> {
   List<Map<String, dynamic>> _fichas = [];
+  String _searchText = '';
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _cargarFichas();
+
+    // Ensures keyboard does not auto-focus on the search bar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _searchFocusNode.unfocus();
+      FocusScope.of(context).unfocus();
+    });
   }
 
   Future<void> _cargarFichas() async {
@@ -42,102 +50,142 @@ class _FichasPlantasState extends State<FichasPlantas> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            Image.asset('assets/ficha.png', width: 40, height: 40),
-            SizedBox(width: 20),
-            Text(
-              'Fichas de Plantas',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-      backgroundColor: const Color(0xFFD0EAFF),
-      floatingActionButton: Builder(
-        builder: (context) => FloatingActionButton(
-          onPressed: () async {
-            final added = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AgregarFicha()),
-            );
+    final filteredFichas = _fichas.where((ficha) {
+      if (_searchText.isEmpty) return true;
 
-            if (added == true) {
-              _cargarFichas(); // reload from SharedPreferences
-            }
-          },
-          child: Icon(Icons.add),
-        ),
-      ),
-      body: ListView(
-        physics: ScrollPhysics(),
-        padding: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          top: 20,
-          bottom: 100,
-        ),
-        children: _fichas.asMap().entries.map((entry) {
-          final index = entry.key;
-          final ficha = entry.value;
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 15), // spacing between items
-            child: ElevatedButton(
-              onPressed: () => _verFichaDetalle(ficha, index),
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+      final nombre = (ficha['nombre'] ?? '').toString().toLowerCase();
+      final descripcion = (ficha['descripcion'] ?? '').toString().toLowerCase();
+      final usos = (ficha['usos'] ?? '').toString().toLowerCase();
+
+      return nombre.contains(_searchText) ||
+          descripcion.contains(_searchText) ||
+          usos.contains(_searchText);
+    }).toList();
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        FocusScope.of(context).unfocus(); // hide keyboard
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Image.asset('assets/ficha.png', width: 40, height: 40),
+              SizedBox(width: 20),
+              Text(
+                'Fichas de Plantas',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.file(
-                      File(ficha['imagen']),
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover, // important
+            ],
+          ),
+        ),
+        backgroundColor: const Color(0xFFD0EAFF),
+        floatingActionButton: Builder(
+          builder: (context) => FloatingActionButton(
+            onPressed: () async {
+              final added = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AgregarFicha()),
+              );
+
+              if (added == true) {
+                _cargarFichas(); // reload from SharedPreferences
+              }
+            },
+            child: Icon(Icons.add),
+          ),
+        ),
+        body: ListView(
+          physics: ScrollPhysics(),
+          padding: const EdgeInsets.only(
+            left: 15,
+            right: 15,
+            top: 20,
+            bottom: 100,
+          ),
+          children: [
+            TextFormField(
+              focusNode: _searchFocusNode,
+              decoration: InputDecoration(
+                labelText: 'Buscar una planta...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.white.withValues(alpha: 0.6),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchText = value.toLowerCase();
+                });
+              },
+            ),
+            SizedBox(height: 20),
+            if (filteredFichas.isEmpty)
+              Column(children: [Text('No se encontraron plantas')]),
+            ...filteredFichas.asMap().entries.map((entry) {
+              final index = entry.key;
+              final ficha = entry.value;
+              return Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 15,
+                ), // spacing between items
+                child: ElevatedButton(
+                  onPressed: () => _verFichaDetalle(ficha, index),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   ),
-                  SizedBox(width: 10),
-                  Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        ficha['nombre'],
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(
+                          File(ficha['imagen']),
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover, // important
                         ),
                       ),
-                      Text(
-                        ficha['descripcion'],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        ficha['usos'],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
+                      SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ficha['nombre'],
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            ficha['descripcion'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            ficha['usos'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          );
-        }).toList(),
+                ),
+              );
+            }).toList(),
+          ],
+        ),
       ),
     );
   }
