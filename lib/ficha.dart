@@ -73,55 +73,62 @@ class _FichasPlantasState extends State<FichasPlantas> {
           child: Icon(Icons.add),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text(
-              'Fichas guardadas:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _fichas.length,
-              itemBuilder: (context, i) {
-                final ficha = _fichas[i];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  child: ListTile(
-                    onTap: () => _verFichaDetalle(ficha),
-                    leading: ficha['imagen'] != null
-                        ? Image.file(
-                            File(ficha['imagen']),
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          )
-                        : const Icon(Icons.local_florist),
-                    title: Text(ficha['nombre']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Descripción: ${ficha['descripcion']}'),
-                        Text('Usos: ${ficha['usos']}'),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _eliminarFicha(i),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
+      body: ListView(
+        physics: ScrollPhysics(),
+        padding: const EdgeInsets.only(
+          left: 10,
+          right: 10,
+          top: 20,
+          bottom: 100,
         ),
+        children: _fichas.map((ficha) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 15), // spacing between items
+            child: ElevatedButton(
+              onPressed: () => _verFichaDetalle(ficha),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                padding: EdgeInsets.all(20),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset('assets/plant_example.jpg', width: 80),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ficha['nombre'],
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        ficha['descripcion'],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        ficha['usos'],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

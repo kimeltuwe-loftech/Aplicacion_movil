@@ -88,6 +88,7 @@ flutter:
     - assets/configuracion_principal.png
     - assets/ficha.png 
     - assets/mapuche_symbol_loading.png
+    - assets/plant_example.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

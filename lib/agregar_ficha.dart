@@ -144,9 +144,13 @@ class _AgregarFichaState extends State<AgregarFicha> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        _agregarFicha();
+                        await _agregarFicha();
+                        if (!mounted) return;
+                        Navigator.of(
+                          context,
+                        ).pop();
                       }
                     },
                     style: ElevatedButton.styleFrom(
