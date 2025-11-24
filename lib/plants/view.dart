@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../util/plant_storage.dart';
 
 class FichaDetalle extends StatelessWidget {
   final Map<String, dynamic> ficha;
-  const FichaDetalle({super.key, required this.ficha});
+  final int index;
+  const FichaDetalle({super.key, required this.ficha, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +14,7 @@ class FichaDetalle extends StatelessWidget {
         title: Text(ficha['nombre'] ?? 'Detalle'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.delete, color: Colors.red, size: 30),
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
@@ -35,12 +37,13 @@ class FichaDetalle extends StatelessWidget {
               );
 
               if (confirm == true) {
-                Navigator.of(
-                  context,
-                ).pop(true); // <- tell previous screen to delete
+                await PlantStorage.deletePlant(index);
+                if (!context.mounted) return;
+                Navigator.of(context).pop(true);
               }
             },
           ),
+          SizedBox(width: 10),
         ],
       ),
       body: Padding(

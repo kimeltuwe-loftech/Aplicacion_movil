@@ -26,11 +26,17 @@ class _FichasPlantasState extends State<FichasPlantas> {
     });
   }
 
-  void _verFichaDetalle(Map<String, dynamic> ficha) {
-    Navigator.push(
+  Future<void> _verFichaDetalle(Map<String, dynamic> ficha, int index) async {
+    final deleted = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FichaDetalle(ficha: ficha)),
+      MaterialPageRoute(
+        builder: (context) => FichaDetalle(ficha: ficha, index: index),
+      ),
     );
+
+    if (deleted == true) {
+      _cargarFichas(); // reload list from storage
+    }
   }
 
   @override
@@ -73,11 +79,13 @@ class _FichasPlantasState extends State<FichasPlantas> {
           top: 20,
           bottom: 100,
         ),
-        children: _fichas.map((ficha) {
+        children: _fichas.asMap().entries.map((entry) {
+          final index = entry.key;
+          final ficha = entry.value;
           return Padding(
             padding: const EdgeInsets.only(bottom: 15), // spacing between items
             child: ElevatedButton(
-              onPressed: () => _verFichaDetalle(ficha),
+              onPressed: () => _verFichaDetalle(ficha, index),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
