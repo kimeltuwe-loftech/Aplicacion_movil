@@ -47,17 +47,32 @@ class FichaDetalle extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ficha['imagen'] != null
-                ? Image.file(
-                    File(ficha['imagen']),
-                    width: 300,
-                    height: 300,
-                    fit: BoxFit.cover,
-                  )
-                : const Icon(Icons.local_florist, size: 100),
+            SizedBox(height: 20),
+            Center(
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.file(File(ficha['imagen']), fit: BoxFit.cover),
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
             Text(
               'Nombre: ${ficha['nombre']}',

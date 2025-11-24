@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import '../util/plant_storage.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class AgregarFicha extends StatefulWidget {
   const AgregarFicha({super.key});
@@ -14,27 +16,29 @@ class _AgregarFichaState extends State<AgregarFicha> {
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _descripcionController = TextEditingController();
   final TextEditingController _usosController = TextEditingController();
-
-  // String? _imagePath;
+  String? _imagePath;
 
   Future<void> _agregarFicha() async {
     await PlantStorage.addPlant({
       'nombre': _nombreController.text,
       'descripcion': _descripcionController.text,
       'usos': _usosController.text,
-      // 'imagen': _imagePath,
+      'imagen': _imagePath,
     });
   }
 
-  // Future<void> _tomarFoto() async {
-  //   final picker = ImagePicker();
-  //   final picked = await picker.pickImage(source: ImageSource.camera);
-  //   if (picked != null) {
-  //     setState(() {
-  //       _imagePath = picked.path;
-  //     });
-  //   }
-  // }
+  Future<String?> pickAndSaveImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.camera);
+    if (picked == null) return null;
+
+    // Copy to app documents directory
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final savedImage = await File(picked.path).copy('${appDir.path}/$fileName');
+
+    return savedImage.path;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,32 +103,40 @@ class _AgregarFichaState extends State<AgregarFicha> {
                       v == null || v.isEmpty ? 'Ingrese los usos' : null,
                 ),
                 const SizedBox(height: 10),
-                // Row(
-                //   children: [
-                //     ElevatedButton(
-                //       onPressed: _tomarFoto,
-                //       style: ElevatedButton.styleFrom(
-                //         shape: RoundedRectangleBorder(
-                //           borderRadius: BorderRadius.circular(10),
-                //         ),
-                //         backgroundColor: const Color(0xFF009900),
-                //         foregroundColor: Colors.white,
-                //       ),
-                //       child: Row(
-                //         children: [
-                //           Icon(Icons.add_a_photo),
-                //           SizedBox(width: 5),
-                //           Text('Tomar foto'),
-                //         ],
-                //       ),
-                //     ),
-                //     const SizedBox(width: 10),
-                //     _imagePath != null
-                //         ? Image.file(File(_imagePath!), width: 50, height: 50)
-                //         : const SizedBox(),
-                //   ],
-                // ),
-                // const SizedBox(height: 10),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        final path = await pickAndSaveImage();
+                        if (path != null) {
+                          print('Not null');
+                          setState(() {
+                            _imagePath = path;
+                          });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        backgroundColor: const Color(0xFF009900),
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.add_a_photo),
+                          SizedBox(width: 5),
+                          Text('Tomar foto'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    _imagePath != null
+                        ? Image.file(File(_imagePath!), width: 50, height: 50)
+                        : const SizedBox(),
+                  ],
+                ),
+                const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

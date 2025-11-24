@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'add.dart';
 import 'view.dart';
@@ -97,8 +98,8 @@ class _FichasPlantasState extends State<FichasPlantas> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      'assets/plant_example.jpg',
+                    child: Image.file(
+                      File(ficha['imagen']),
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover, // important
