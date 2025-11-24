@@ -64,11 +64,15 @@ class _FichasPlantasState extends State<FichasPlantas> {
       backgroundColor: const Color(0xFFD0EAFF),
       floatingActionButton: Builder(
         builder: (context) => FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final added = await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AgregarFicha()),
             );
+
+            if (added == true) {
+              _cargarFichas(); // reload from SharedPreferences
+            }
           },
           child: Icon(Icons.add),
         ),

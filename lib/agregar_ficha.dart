@@ -150,7 +150,7 @@ class _AgregarFichaState extends State<AgregarFicha> {
                         if (!mounted) return;
                         Navigator.of(
                           context,
-                        ).pop();
+                        ).pop(true);
                       }
                     },
                     style: ElevatedButton.styleFrom(
