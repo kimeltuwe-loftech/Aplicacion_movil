@@ -8,7 +8,41 @@ class FichaDetalle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(ficha['nombre'] ?? 'Detalle')),
+      appBar: AppBar(
+        title: Text(ficha['nombre'] ?? 'Detalle'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Eliminar planta'),
+                  content: const Text(
+                    '¿Seguro que quieres eliminar esta planta?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Eliminar'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirm == true) {
+                Navigator.of(
+                  context,
+                ).pop(true); // <- tell previous screen to delete
+              }
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

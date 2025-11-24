@@ -1,8 +1,6 @@
-import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:image_picker/image_picker.dart';
+import '../util/plant_storage.dart';
 
 class AgregarFicha extends StatefulWidget {
   const AgregarFicha({super.key});
@@ -17,40 +15,26 @@ class _AgregarFichaState extends State<AgregarFicha> {
   final TextEditingController _descripcionController = TextEditingController();
   final TextEditingController _usosController = TextEditingController();
 
-  String? _imagePath;
+  // String? _imagePath;
 
   Future<void> _agregarFicha() async {
-    List<Map<String, dynamic>> fichas = [];
-    // Get current plants
-    final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getString('fichas_plantas');
-    if (data != null) {
-      fichas = (json.decode(data) as List)
-          .map((e) => Map<String, dynamic>.from(e))
-          .toList();
-    }
-
-    // Add ficha
-    fichas.add({
+    await PlantStorage.addPlant({
       'nombre': _nombreController.text,
       'descripcion': _descripcionController.text,
       'usos': _usosController.text,
       // 'imagen': _imagePath,
     });
-
-    // Store ficha
-    await prefs.setString('fichas_plantas', json.encode(fichas));
   }
 
-  Future<void> _tomarFoto() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.camera);
-    if (picked != null) {
-      setState(() {
-        _imagePath = picked.path;
-      });
-    }
-  }
+  // Future<void> _tomarFoto() async {
+  //   final picker = ImagePicker();
+  //   final picked = await picker.pickImage(source: ImageSource.camera);
+  //   if (picked != null) {
+  //     setState(() {
+  //       _imagePath = picked.path;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -148,9 +132,7 @@ class _AgregarFichaState extends State<AgregarFicha> {
                       if (_formKey.currentState!.validate()) {
                         await _agregarFicha();
                         if (!mounted) return;
-                        Navigator.of(
-                          context,
-                        ).pop(true);
+                        Navigator.of(context).pop(true);
                       }
                     },
                     style: ElevatedButton.styleFrom(

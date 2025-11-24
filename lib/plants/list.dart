@@ -1,9 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'add.dart';
 import 'view.dart';
+import '../util/plant_storage.dart';
 
 class FichasPlantas extends StatefulWidget {
   const FichasPlantas({super.key});
@@ -22,20 +20,9 @@ class _FichasPlantasState extends State<FichasPlantas> {
   }
 
   Future<void> _cargarFichas() async {
-    final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getString('fichas_plantas');
-    if (data != null) {
-      setState(() {
-        _fichas = (json.decode(data) as List)
-            .map((e) => Map<String, dynamic>.from(e))
-            .toList();
-      });
-    }
-  }
-
-  void _eliminarFicha(int index) {
+    final plants = await PlantStorage.loadPlants();
     setState(() {
-      _fichas.removeAt(index);
+      _fichas = plants;
     });
   }
 
@@ -95,12 +82,20 @@ class _FichasPlantasState extends State<FichasPlantas> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                 ),
-                padding: EdgeInsets.all(20),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset('assets/plant_example.jpg', width: 80),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      'assets/plant_example.jpg',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover, // important
+                    ),
+                  ),
                   SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
