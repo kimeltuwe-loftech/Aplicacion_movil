@@ -53,6 +53,7 @@ class _SensoresState extends State<Sensores> {
                     ),
                   ),
                   Text(getRandomMapucheFact(), textAlign: TextAlign.center),
+                  Image.asset('assets/mascotte.png', width: 80),
                   SizedBox(height: 30),
                   Builder(
                     builder: (context) => ElevatedButton(
