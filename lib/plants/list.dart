@@ -152,32 +152,34 @@ class _FichasPlantasState extends State<FichasPlantas> {
                         ),
                       ),
                       SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            ficha['nombre'],
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              ficha['nombre'],
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
-                          ),
-                          Text(
-                            ficha['descripcion'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
+                            Text(
+                              ficha['descripcion'],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
                             ),
-                          ),
-                          Text(
-                            ficha['usos'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
+                            Text(
+                              ficha['usos'],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
