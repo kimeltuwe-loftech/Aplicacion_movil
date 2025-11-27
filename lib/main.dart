@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'sensores.dart';
 import 'plants/list.dart';
+import 'ayudar.dart';
 import 'l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'util/udp.dart';
@@ -57,27 +58,9 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: const Color(0xFFD0EAFF),
         body: ListView(
           children: [
-            Center(
-              child: Container(
-                width: 240,
-                height: 150,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(250),
-                    bottomRight: Radius.circular(250),
-                  ),
-                ),
-                child: Center(
-                  child: Image.asset(
-                    'assets/logo_principal.png',
-                    width: 120,
-                    height: 120,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 30),
+            Image.asset('assets/logo_principal.png', width: 100, height: 100),
+            const SizedBox(height: 35),
 
             // New buttons
             Center(
@@ -124,7 +107,7 @@ class _MyAppState extends State<MyApp> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -163,7 +146,44 @@ class _MyAppState extends State<MyApp> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Ayudar(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 20,
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.help_outline_sharp,
+                              color: const Color(0xFF009900),
+                              size: 50,
+                            ),
+                            SizedBox(width: 20),
+                            Text('Ayudar'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
