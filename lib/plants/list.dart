@@ -144,12 +144,14 @@ class _FichasPlantasState extends State<FichasPlantas> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.file(
-                          File(ficha['imagen']),
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover, // important
-                        ),
+                        child: ficha['imagen'] != null
+                            ? Image.file(
+                                File(ficha['imagen']),
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover, // important
+                              )
+                            : Icon(Icons.nature, size: 80),
                       ),
                       SizedBox(width: 10),
                       Expanded(
