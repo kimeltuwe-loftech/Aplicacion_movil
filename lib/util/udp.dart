@@ -1,109 +1,189 @@
-import 'package:udp/udp.dart';
 import 'dart:async';
 import 'dart:convert';
-import '../globals/sensor_definitions.dart';
+
 import 'package:flutter/foundation.dart';
+import 'package:udp/udp.dart';
+
+import '../globals/sensor_definitions.dart';
 
 class SensorSample {
   final DateTime timestamp;
   final double value;
 
-  SensorSample({
-    required this.timestamp,
-    required this.value,
-  });
+  SensorSample({required this.timestamp, required this.value});
 }
 
-class PrototypeConnection extends ChangeNotifier {
-  UDP? _receiver;
-  // now we store timestamp + value
-  final Map<SensorType, List<SensorSample>> _valuesPerSensor = {};
+/// Receives UDP packets and stores ONLY the latest value per sensor.
+class UdpSensorReceiver extends ChangeNotifier {
+  UDP? _udp;
 
-  // GLOBAL last measurement (for overall loading screen)
-  DateTime? _lastMeasurementTime;
+  final Map<SensorType, double> _latestValue = {};
+  final Map<SensorType, DateTime> _lastSeen = {};
 
-  // PER-SENSOR last measurement
-  final Map<SensorType, DateTime> _lastMeasurementPerSensor = {};
+  // Store recent history per sensor (keep last 10)
+  final Map<SensorType, List<SensorSample>> _historyPerSensor = {};
 
-  Timer? _staleTimer;
-  bool _isStale = true; // start as "loading" until the first value comes in
+  /// Latest value for a sensor (null if never received).
+  double? latestValueOf(SensorType sensorType) => _latestValue[sensorType];
 
-  bool get isStale => _isStale;
+  /// When we last received data for a sensor (null if never received).
+  DateTime? lastSeenOf(SensorType sensorType) => _lastSeen[sensorType];
 
-  /// Per-sensor connection status: true if this sensor had data in last 3 seconds
-  bool isSensorConnected(SensorType sensorType) {
-    final last = _lastMeasurementPerSensor[sensorType];
-    if (last == null) return false;
-    return DateTime.now().difference(last) <= const Duration(seconds: 3);
-  }
-
-  PrototypeConnection() {
-    // Check once per second for global and per-sensor "staleness"
-    _staleTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final last = _lastMeasurementTime;
-      final now = DateTime.now();
-      final shouldBeStale =
-          last == null || now.difference(last) > const Duration(seconds: 3);
-
-      if (shouldBeStale != _isStale) {
-        _isStale = shouldBeStale;
-        notifyListeners();
-      }
-    });
-  }
-
-  // Now returns SensorSample instead of FlSpot
+  /// History of values for a sensor (empty if never received).
   List<SensorSample> getSensorValues(SensorType sensorType) {
-    return _valuesPerSensor[sensorType] ?? [];
+    return _historyPerSensor[sensorType] ?? [];
   }
 
-  void startListeningUDP() async {
-    _receiver = await UDP.bind(Endpoint.any(port: Port(12345)));
-    _receiver!.asStream().listen((datagram) {
+  /// True if we got data for this sensor within [timeout].
+  bool isSensorConnected(
+    SensorType sensorType, {
+    Duration timeout = const Duration(seconds: 3),
+  }) {
+    final last = _lastSeen[sensorType];
+    if (last == null) return false;
+    return DateTime.now().difference(last) <= timeout;
+  }
+
+  /// True if ANY sensor is connected within [timeout].
+  bool isAnySensorConnected({Duration timeout = const Duration(seconds: 3)}) {
+    final now = DateTime.now();
+    for (final t in _lastSeen.values) {
+      if (now.difference(t) <= timeout) return true;
+    }
+    return false;
+  }
+
+  /// Start listening on UDP.
+  Future<void> start({int port = 12345}) async {
+    _udp = await UDP.bind(Endpoint.any(port: Port(port)));
+
+    _udp!.asStream().listen((datagram) {
       if (datagram == null) return;
+
       final dataString = utf8.decode(datagram.data);
-      final sensorData = json.decode(dataString) as List<dynamic>;
+      final decoded = json.decode(dataString);
 
-      for (var measurement in sensorData) {
-        final sensorTypeString = measurement["type"];
-        final sensorTypeEnum = sensorTypeFromUdpLabel(sensorTypeString);
-        if (sensorTypeEnum == null) return;
+      if (decoded is! List) return;
 
-        var rawValue = measurement["value"];
+      var didUpdate = false;
+      final now = DateTime.now();
 
-        double? value;
-        if (rawValue is num) {
-          value = rawValue.toDouble();
-        } else if (rawValue is String) {
-          value = double.tryParse(rawValue);
-        }
+      for (final item in decoded) {
+        if (item is! Map) continue;
 
-        if (value != null) {
-          final now = DateTime.now();
+        final typeLabel = item['type'];
+        final sensorType = sensorTypeFromUdpLabel(typeLabel);
+        if (sensorType == null) continue;
 
-          // Update global last measurement
-          _lastMeasurementTime = now;
+        final rawValue = item['value'];
+        final value = _toDouble(rawValue);
+        if (value == null) continue;
 
-          // Update per-sensor last measurement
-          _lastMeasurementPerSensor[sensorTypeEnum] = now;
+        _latestValue[sensorType] = value;
+        _lastSeen[sensorType] = now;
 
-          _valuesPerSensor.putIfAbsent(sensorTypeEnum, () => []);
-          _valuesPerSensor[sensorTypeEnum]!.add(
-            SensorSample(timestamp: now, value: value),
-          );
-          if (_valuesPerSensor[sensorTypeEnum]!.length > 10) {
-            _valuesPerSensor[sensorTypeEnum]!.removeAt(0);
-          }
-        }
+        // Store history (keep last 10)
+        final list = _historyPerSensor.putIfAbsent(sensorType, () => []);
+        list.add(SensorSample(timestamp: now, value: value));
+        if (list.length > 10) list.removeAt(0);
+
+        didUpdate = true;
       }
-      notifyListeners();
+
+      if (didUpdate) notifyListeners();
     });
+  }
+
+  void stop() {
+    _udp?.close();
+    _udp = null;
+  }
+
+  double? _toDouble(dynamic rawValue) {
+    if (rawValue is num) return rawValue.toDouble();
+    if (rawValue is String) return double.tryParse(rawValue);
+    return null;
   }
 
   @override
   void dispose() {
-    _receiver?.close();
-    _staleTimer?.cancel();
+    stop();
+    super.dispose();
+  }
+}
+
+/// Notifies when the "ANY sensor connected" status flips between connected/stale.
+class AnySensorConnectionNotifier extends ChangeNotifier {
+  final UdpSensorReceiver receiver;
+  final Duration timeout;
+  final Duration checkInterval;
+
+  Timer? _timer;
+  bool _isConnected = false;
+
+  bool get isConnected => _isConnected;
+
+  AnySensorConnectionNotifier(
+    this.receiver, {
+    this.timeout = const Duration(seconds: 3),
+    this.checkInterval = const Duration(seconds: 1),
+  }) {
+    receiver.addListener(_recompute);
+    _timer = Timer.periodic(checkInterval, (_) => _recompute());
+    _recompute();
+  }
+
+  void _recompute() {
+    final next = receiver.isAnySensorConnected(timeout: timeout);
+    if (next != _isConnected) {
+      _isConnected = next;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    receiver.removeListener(_recompute);
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+
+/// Notifies when a SPECIFIC sensor's connected/stale status flips.
+class SensorConnectionNotifier extends ChangeNotifier {
+  final UdpSensorReceiver receiver;
+  final SensorType sensorType;
+  final Duration timeout;
+  final Duration checkInterval;
+
+  Timer? _timer;
+  bool _isConnected = false;
+
+  bool get isConnected => _isConnected;
+
+  SensorConnectionNotifier(
+    this.receiver, {
+    required this.sensorType,
+    this.timeout = const Duration(seconds: 3),
+    this.checkInterval = const Duration(seconds: 1),
+  }) {
+    receiver.addListener(_recompute);
+    _timer = Timer.periodic(checkInterval, (_) => _recompute());
+    _recompute();
+  }
+
+  void _recompute() {
+    final next = receiver.isSensorConnected(sensorType, timeout: timeout);
+    if (next != _isConnected) {
+      _isConnected = next;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    receiver.removeListener(_recompute);
+    _timer?.cancel();
     super.dispose();
   }
 }
